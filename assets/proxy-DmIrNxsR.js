@@ -1,0 +1,1 @@
+var e=`https://scholar-proxy.workers.dev/`,t=[`api.semanticscholar.org`,`export.arxiv.org`];function n(e){try{let{hostname:n}=new URL(e);return t.some(e=>n===e||n.endsWith(`.${e}`))}catch{return!1}}function r(t){return n(t)?`${e}${encodeURIComponent(t)}`:t}export{r as t};
