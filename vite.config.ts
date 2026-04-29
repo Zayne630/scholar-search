@@ -1,19 +1,22 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import tailwindcss from '@tailwindcss/vite'
+import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
 import { fileURLToPath, URL } from 'node:url'
+import path from 'node:path'
 
 export default defineConfig({
-  plugins: [vue(), tailwindcss()],
+  plugins: [
+    vue(),
+    tailwindcss(),
+    VueI18nPlugin({
+      include: path.resolve(__dirname, './src/locales/**'),
+    }),
+  ],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
   base: '/scholar-search/',
-  define: {
-    __VUE_I18N_LEGACY_API__: true,
-    __VUE_I18N_FULL_INSTALL__: true,
-    __INTLIFY_PROD_DEVTOOLS__: false,
-  },
 })
