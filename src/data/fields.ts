@@ -1,0 +1,257 @@
+/**
+ * 研究方向层级数据
+ *
+ * 大方向 (ResearchField) -> 子方向 (SubField) -> 搜索关键词
+ */
+
+export interface SubField {
+  name: string        // 中文名
+  nameEn: string      // 英文名
+  keyword: string     // 搜索关键词
+  description: string // 简短描述
+}
+
+export interface ResearchField {
+  slug: string        // URL slug
+  name: string        // 中文名
+  nameEn: string      // 英文名
+  keyword: string     // 主搜索关键词
+  icon: string        // 图标名称 (对应 ionicons5)
+  color: string       // 主题色
+  description: string // 方向简介
+  subfields: SubField[] // 子方向列表
+}
+
+export const researchFields: ResearchField[] = [
+  {
+    slug: 'llm',
+    name: '大模型',
+    nameEn: 'Large Language Models',
+    keyword: 'large language model',
+    icon: 'BulbOutline',
+    color: '#6366f1',
+    description: '研究大型语言模型的架构、训练、推理与应用，涵盖 Prompt 工程、对齐技术、推理能力等核心方向。',
+    subfields: [
+      { name: '提示工程', nameEn: 'Prompt Engineering', keyword: 'prompt engineering', description: '设计和优化 LLM 输入提示以提升输出质量' },
+      { name: '人类反馈强化学习', nameEn: 'RLHF / RLAIF', keyword: 'RLHF reinforcement learning from human feedback', description: '通过人类反馈或 AI 反馈对齐语言模型' },
+      { name: '思维链推理', nameEn: 'Chain-of-Thought Reasoning', keyword: 'chain-of-thought reasoning', description: '让模型逐步推理以解决复杂问题' },
+      { name: 'LLM 智能体', nameEn: 'LLM Agents', keyword: 'LLM agent', description: '基于大语言模型的自主智能体系统' },
+      { name: '微调技术', nameEn: 'Fine-tuning (LoRA etc.)', keyword: 'LoRA fine-tuning large language model', description: '参数高效微调方法如 LoRA、QLoRA 等' },
+      { name: '检索增强生成', nameEn: 'Retrieval-Augmented Generation', keyword: 'retrieval augmented generation', description: '结合外部知识检索增强 LLM 生成能力' },
+      { name: '多模态大模型', nameEn: 'Multimodal LLM', keyword: 'multimodal large language model', description: '支持文本、图像、音频等多模态输入的大模型' },
+      { name: 'LLM 推理能力', nameEn: 'LLM Reasoning', keyword: 'reasoning language model', description: '提升大模型的逻辑推理与数学推理能力' },
+      { name: '安全与对齐', nameEn: 'LLM Safety & Alignment', keyword: 'AI safety alignment large language model', description: '确保大模型安全、可控、符合人类价值观' },
+      { name: '代码生成', nameEn: 'Code Generation', keyword: 'code generation large language model', description: '基于 LLM 的程序代码自动生成与理解' },
+    ],
+  },
+  {
+    slug: 'computer-vision',
+    name: '计算机视觉',
+    nameEn: 'Computer Vision',
+    keyword: 'computer vision',
+    icon: 'EyeOutline',
+    color: '#10b981',
+    description: '研究让计算机理解图像和视频内容的核心技术，包括检测、分割、生成等方向。',
+    subfields: [
+      { name: '目标检测', nameEn: 'Object Detection', keyword: 'object detection', description: '在图像中定位和识别特定目标' },
+      { name: '图像分割', nameEn: 'Image Segmentation', keyword: 'image segmentation', description: '将图像像素级划分为有意义的区域' },
+      { name: '3D 视觉与点云', nameEn: '3D Vision & Point Cloud', keyword: '3D vision point cloud', description: '三维场景理解、点云处理与重建' },
+      { name: '图像生成', nameEn: 'GAN & Image Generation', keyword: 'image generation GAN diffusion', description: '基于生成模型的图像合成与编辑' },
+      { name: '视觉 Transformer', nameEn: 'Vision Transformer', keyword: 'vision transformer ViT', description: 'Transformer 架构在视觉任务中的应用' },
+      { name: 'OCR 文字识别', nameEn: 'OCR & Text Recognition', keyword: 'OCR text recognition scene text', description: '场景文字检测与识别技术' },
+      { name: '人脸识别', nameEn: 'Face Recognition', keyword: 'face recognition', description: '人脸检测、对齐、特征提取与识别' },
+      { name: '视频理解', nameEn: 'Video Understanding', keyword: 'video understanding action recognition', description: '视频中的动作识别、时序理解等' },
+      { name: '医学图像分析', nameEn: 'Medical Image Analysis', keyword: 'medical image analysis', description: '深度学习在医学影像诊断中的应用' },
+      { name: '自监督视觉学习', nameEn: 'Self-supervised Visual Learning', keyword: 'self-supervised learning vision', description: '无需标注的视觉表征学习方法' },
+    ],
+  },
+  {
+    slug: 'embodied-ai',
+    name: '具身智能',
+    nameEn: 'Embodied AI',
+    keyword: 'embodied intelligence',
+    icon: 'RocketOutline',
+    color: '#ec4899',
+    description: '研究具有物理身体的智能体如何通过感知和行动与环境交互，实现通用智能。',
+    subfields: [
+      { name: '机器人操作', nameEn: 'Robotic Manipulation', keyword: 'robotic manipulation grasping', description: '机械臂抓取、操作与灵巧控制' },
+      { name: '导航与路径规划', nameEn: 'Navigation & Path Planning', keyword: 'embodied navigation path planning', description: '具身智能体在复杂环境中的导航' },
+      { name: '仿真到现实', nameEn: 'Sim2Real Transfer', keyword: 'sim2real transfer robotics', description: '从仿真环境到真实世界的迁移学习' },
+      { name: '具身感知', nameEn: 'Embodied Perception', keyword: 'embodied perception', description: '多传感器融合的具身环境感知' },
+      { name: '任务规划', nameEn: 'Task Planning', keyword: 'embodied task planning', description: '长时序任务的分解与执行规划' },
+      { name: '人机交互', nameEn: 'Human-Robot Interaction', keyword: 'human robot interaction embodied', description: '人与具身智能体的自然交互与协作' },
+    ],
+  },
+  {
+    slug: 'robotics',
+    name: '机器人',
+    nameEn: 'Robotics',
+    keyword: 'robotics',
+    icon: 'HardwareChipOutline',
+    color: '#f59e0b',
+    description: '研究机器人的运动控制、感知、规划和协作技术，涵盖工业、服务和特种机器人。',
+    subfields: [
+      { name: '运动控制', nameEn: 'Motion Control', keyword: 'robot motion control', description: '机器人的运动学与动力学控制' },
+      { name: 'SLAM', nameEn: 'SLAM', keyword: 'SLAM simultaneous localization mapping', description: '同时定位与地图构建技术' },
+      { name: '路径规划', nameEn: 'Path Planning', keyword: 'robot path planning', description: '机器人运动轨迹的规划与优化' },
+      { name: '多机器人协同', nameEn: 'Multi-robot Coordination', keyword: 'multi-robot coordination swarm', description: '多机器人系统的协作与集群控制' },
+      { name: '软体机器人', nameEn: 'Soft Robotics', keyword: 'soft robotics', description: '柔性材料驱动的仿生软体机器人' },
+      { name: '人形机器人', nameEn: 'Humanoid Robots', keyword: 'humanoid robot', description: '双足人形机器人的设计与控制' },
+      { name: '无人机', nameEn: 'UAV / Drones', keyword: 'UAV drone autonomous flight', description: '无人机自主飞行与任务执行' },
+      { name: '工业机器人', nameEn: 'Industrial Robotics', keyword: 'industrial robot automation', description: '工业场景中的自动化机器人应用' },
+    ],
+  },
+  {
+    slug: 'control-theory',
+    name: '控制理论',
+    nameEn: 'Control Theory',
+    keyword: 'control theory',
+    icon: 'SettingsOutline',
+    color: '#3b82f6',
+    description: '研究系统建模、分析与控制设计的理论与方法，是自动化的核心基础学科。',
+    subfields: [
+      { name: '模型预测控制', nameEn: 'Model Predictive Control (MPC)', keyword: 'model predictive control MPC', description: '基于模型的滚动时域优化控制' },
+      { name: '鲁棒控制', nameEn: 'Robust Control', keyword: 'robust control H-infinity', description: '应对系统不确定性的鲁棒控制器设计' },
+      { name: '自适应控制', nameEn: 'Adaptive Control', keyword: 'adaptive control', description: '控制器参数随系统变化自动调整' },
+      { name: '最优控制', nameEn: 'Optimal Control', keyword: 'optimal control', description: '基于性能指标最优的控制策略设计' },
+      { name: '非线性控制', nameEn: 'Nonlinear Control', keyword: 'nonlinear control', description: '非线性系统的分析与控制方法' },
+      { name: '智能控制', nameEn: 'Intelligent Control', keyword: 'intelligent control neural network', description: '融合机器学习的智能控制方法' },
+      { name: '过程控制', nameEn: 'Process Control', keyword: 'process control industrial', description: '工业过程自动化中的控制技术' },
+    ],
+  },
+  {
+    slug: 'signal-processing',
+    name: '信号处理',
+    nameEn: 'Signal Processing',
+    keyword: 'signal processing',
+    icon: 'PulseOutline',
+    color: '#ef4444',
+    description: '研究信号的采集、分析、变换与重建，广泛应用于通信、雷达、生物医学等领域。',
+    subfields: [
+      { name: '时频分析', nameEn: 'Time-Frequency Analysis', keyword: 'time-frequency analysis wavelet', description: '信号在时域和频域的联合分析' },
+      { name: '滤波器设计', nameEn: 'Filter Design', keyword: 'filter design digital', description: '数字与模拟滤波器的设计与实现' },
+      { name: '阵列信号处理', nameEn: 'Array Signal Processing', keyword: 'array signal processing beamforming', description: '传感器阵列的波束形成与信号处理' },
+      { name: '图像处理', nameEn: 'Image Processing', keyword: 'image processing', description: '图像增强、恢复、压缩等基础处理' },
+      { name: '语音处理', nameEn: 'Speech Processing', keyword: 'speech processing recognition', description: '语音信号的识别、合成与增强' },
+      { name: '雷达信号处理', nameEn: 'Radar Signal Processing', keyword: 'radar signal processing', description: '雷达回波信号的检测与处理' },
+      { name: '生物医学信号', nameEn: 'Biomedical Signal Processing', keyword: 'biomedical signal processing EEG ECG', description: '生理信号（EEG、ECG等）的处理与分析' },
+    ],
+  },
+  {
+    slug: 'deep-learning',
+    name: '深度学习',
+    nameEn: 'Deep Learning',
+    keyword: 'deep learning',
+    icon: 'BulbOutline',
+    color: '#a855f7',
+    description: '研究基于多层神经网络的表征学习方法，是现代 AI 的核心技术基础。',
+    subfields: [
+      { name: '卷积神经网络', nameEn: 'CNN', keyword: 'convolutional neural network CNN', description: '卷积神经网络架构与设计方法' },
+      { name: '循环神经网络', nameEn: 'RNN / LSTM', keyword: 'RNN LSTM recurrent neural network', description: '序列建模的循环神经网络方法' },
+      { name: 'Transformer', nameEn: 'Transformer', keyword: 'transformer attention mechanism', description: '基于自注意力机制的 Transformer 架构' },
+      { name: '图神经网络', nameEn: 'Graph Neural Networks', keyword: 'graph neural network GNN', description: '图结构数据的神经网络学习方法' },
+      { name: '扩散模型', nameEn: 'Diffusion Models', keyword: 'diffusion model', description: '基于扩散过程的生成模型' },
+      { name: '自监督学习', nameEn: 'Self-supervised Learning', keyword: 'self-supervised learning', description: '利用数据自身结构进行无标注学习' },
+      { name: '对比学习', nameEn: 'Contrastive Learning', keyword: 'contrastive learning', description: '通过正负样本对比进行表征学习' },
+      { name: '知识蒸馏', nameEn: 'Knowledge Distillation', keyword: 'knowledge distillation', description: '将大模型知识迁移到小模型的方法' },
+    ],
+  },
+  {
+    slug: 'reinforcement-learning',
+    name: '强化学习',
+    nameEn: 'Reinforcement Learning',
+    keyword: 'reinforcement learning',
+    icon: 'GitMergeOutline',
+    color: '#3b82f6',
+    description: '研究智能体通过与环境交互学习最优策略的方法，广泛应用于游戏、控制和决策。',
+    subfields: [
+      { name: '深度强化学习', nameEn: 'Deep Reinforcement Learning', keyword: 'deep reinforcement learning', description: '结合深度神经网络的强化学习方法' },
+      { name: '多智能体强化学习', nameEn: 'Multi-agent RL', keyword: 'multi-agent reinforcement learning', description: '多智能体系统的协作与竞争学习' },
+      { name: '离线强化学习', nameEn: 'Offline RL', keyword: 'offline reinforcement learning', description: '从固定数据集学习策略的离线方法' },
+      { name: '模仿学习', nameEn: 'Imitation Learning', keyword: 'imitation learning', description: '从专家示范中学习决策策略' },
+      { name: '策略优化', nameEn: 'Policy Optimization', keyword: 'policy optimization PPO SAC', description: '策略梯度与 actor-critic 优化方法' },
+      { name: '奖励设计', nameEn: 'Reward Design', keyword: 'reward design reinforcement learning', description: '奖励函数设计与信号塑造技术' },
+    ],
+  },
+  {
+    slug: 'optimization',
+    name: '优化理论',
+    nameEn: 'Optimization Theory',
+    keyword: 'optimization theory',
+    icon: 'CalculatorOutline',
+    color: '#8b5cf6',
+    description: '研究各类优化问题的理论与算法，是机器学习、控制、运筹等领域的数学基础。',
+    subfields: [
+      { name: '凸优化', nameEn: 'Convex Optimization', keyword: 'convex optimization', description: '凸问题的理论与高效求解方法' },
+      { name: '非凸优化', nameEn: 'Non-convex Optimization', keyword: 'non-convex optimization', description: '非凸问题的全局与局部优化方法' },
+      { name: '组合优化', nameEn: 'Combinatorial Optimization', keyword: 'combinatorial optimization', description: '离散空间的组合优化问题求解' },
+      { name: '元启发式算法', nameEn: 'Meta-heuristic Algorithms', keyword: 'metaheuristic algorithm evolutionary', description: '遗传算法、粒子群等启发式优化方法' },
+      { name: '多目标优化', nameEn: 'Multi-objective Optimization', keyword: 'multi-objective optimization Pareto', description: '多目标冲突下的 Pareto 最优求解' },
+      { name: '分布式优化', nameEn: 'Distributed Optimization', keyword: 'distributed optimization consensus', description: '多节点协作的分布式优化算法' },
+    ],
+  },
+  {
+    slug: 'autonomous-driving',
+    name: '自动驾驶',
+    nameEn: 'Autonomous Driving',
+    keyword: 'autonomous driving',
+    icon: 'RocketOutline',
+    color: '#f97316',
+    description: '研究车辆自主感知、决策与控制技术，实现全自动驾驶。',
+    subfields: [
+      { name: '感知与融合', nameEn: 'Perception & Fusion', keyword: 'autonomous driving perception', description: '自动驾驶环境感知与多源融合' },
+      { name: '决策规划', nameEn: 'Decision & Planning', keyword: 'autonomous driving decision planning', description: '驾驶行为决策与运动规划' },
+      { name: '端到端驾驶', nameEn: 'End-to-end Driving', keyword: 'end-to-end autonomous driving', description: '从传感器输入直接输出控制指令' },
+      { name: '多传感器融合', nameEn: 'Multi-sensor Fusion', keyword: 'multi-sensor fusion lidar camera', description: '激光雷达、摄像头等多传感器数据融合' },
+      { name: '车路协同', nameEn: 'V2X Communication', keyword: 'V2X vehicle infrastructure cooperative', description: '车联网与车路协同自动驾驶' },
+      { name: '自动驾驶安全', nameEn: 'Autonomous Driving Safety', keyword: 'autonomous driving safety verification', description: '自动驾驶系统的安全性验证与保障' },
+    ],
+  },
+  {
+    slug: 'multimodal',
+    name: '多模态学习',
+    nameEn: 'Multimodal Learning',
+    keyword: 'multimodal learning',
+    icon: 'GitMergeOutline',
+    color: '#14b8a6',
+    description: '研究跨模态信息的理解、对齐与生成，融合视觉、语言、音频等模态。',
+    subfields: [
+      { name: '视觉-语言模型', nameEn: 'Vision-Language Models', keyword: 'vision language model', description: '连接视觉与语言的多模态基础模型' },
+      { name: '图文生成', nameEn: 'Text-to-Image Generation', keyword: 'text-to-image generation', description: '根据文本描述生成图像内容' },
+      { name: '跨模态检索', nameEn: 'Cross-modal Retrieval', keyword: 'cross-modal retrieval', description: '不同模态间的相似性检索与匹配' },
+      { name: '多模态融合', nameEn: 'Multimodal Fusion', keyword: 'multimodal fusion', description: '多模态信息的有效融合策略与方法' },
+      { name: '视频问答', nameEn: 'Video Question Answering', keyword: 'video question answering', description: '基于视频内容回答自然语言问题' },
+    ],
+  },
+  {
+    slug: 'nlp',
+    name: '自然语言处理',
+    nameEn: 'Natural Language Processing',
+    keyword: 'natural language processing',
+    icon: 'BulbOutline',
+    color: '#84cc16',
+    description: '研究计算机理解和生成人类语言的技术，是人机交互的基础。',
+    subfields: [
+      { name: '机器翻译', nameEn: 'Machine Translation', keyword: 'machine translation', description: '自动将文本从一种语言翻译为另一种' },
+      { name: '情感分析', nameEn: 'Sentiment Analysis', keyword: 'sentiment analysis', description: '识别文本中的情感倾向与观点' },
+      { name: '命名实体识别', nameEn: 'Named Entity Recognition', keyword: 'named entity recognition NER', description: '从文本中识别人名、地名等实体' },
+      { name: '文本生成', nameEn: 'Text Generation', keyword: 'text generation', description: '自动生成流畅连贯的自然语言文本' },
+      { name: '信息抽取', nameEn: 'Information Extraction', keyword: 'information extraction relation extraction', description: '从非结构化文本中提取结构化信息' },
+      { name: '问答系统', nameEn: 'Question Answering', keyword: 'question answering system', description: '自动回答用户提出的自然语言问题' },
+    ],
+  },
+]
+
+/**
+ * 根据 slug 获取研究方向
+ */
+export function getFieldBySlug(slug: string): ResearchField | undefined {
+  return researchFields.find(f => f.slug === slug)
+}
+
+/**
+ * 根据 slug 获取子方向列表
+ */
+export function getSubfields(slug: string): SubField[] {
+  return getFieldBySlug(slug)?.subfields ?? []
+}
