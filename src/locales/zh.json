@@ -30,7 +30,8 @@
     "showMore": "加载更多",
     "searching": "搜索中...",
     "history": "搜索历史",
-    "clearHistory": "清除历史"
+    "clearHistory": "清除历史",
+    "otherVenues": "结果中的其他期刊"
   },
   "paper": {
     "authors": "作者",
@@ -218,14 +219,27 @@
     "deeplApiKeyHint": "免费注册：https://www.deepl.com/pro#developer",
     "baiduAppId": "百度翻译 App ID",
     "baiduSecretKey": "百度翻译密钥",
-    "baiduHint": "免费注册：https://fanyi-api.baidu.com/",
+    "baiduHint": "国产翻译，每月5万字符免费",
     "translate": "翻译",
     "translating": "翻译中...",
     "aiHint": "使用已配置的 AI API 进行翻译，质量最好",
     "youdaoHint": "免费，无需配置，国内可直接访问",
     "googleHint": "需翻墙才能使用，国内无法直接访问",
     "deeplHint": "翻译质量最高，需免费 API Key",
-    "baiduHint": "国产翻译，每月5万字符免费",
     "mymemoryHint": "免费保底方案，翻译质量一般"
+  },
+  "scope": {
+    "title": "研究领域范围",
+    "hint": "限定检索的学科范围，排除生物、医学、社科等无关学科的论文。范围约束对 OpenAlex、arXiv、Semantic Scholar、CrossRef 四个数据源同时生效。",
+    "focused": "聚焦：电力 / 控制 / 安全",
+    "focusedHint": "限定电气工程、电子工程、控制工程、计算机安全、智能电网、电力电子、输电系统，适合日常文献调研",
+    "broad": "宽泛：工程 + 计算机",
+    "broadHint": "限定工程与计算机科学全部学科，检索相邻方向（如纯机器学习方法论文）时使用",
+    "off": "关闭：全学科检索",
+    "offHint": "不做任何学科约束，检索范围最大，可能混入大量无关结果",
+    "currentPrefix": "检索范围：",
+    "activeBanner": "已按研究领域过滤结果",
+    "offBanner": "未启用领域过滤",
+    "change": "修改"
   }
 }

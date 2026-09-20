@@ -30,7 +30,8 @@
     "showMore": "Load more",
     "searching": "Searching...",
     "history": "Search History",
-    "clearHistory": "Clear history"
+    "clearHistory": "Clear history",
+    "otherVenues": "Other venues from results"
   },
   "paper": {
     "authors": "Authors",
@@ -218,14 +219,27 @@
     "deeplApiKeyHint": "Register for free: https://www.deepl.com/pro#developer",
     "baiduAppId": "Baidu App ID",
     "baiduSecretKey": "Baidu Secret Key",
-    "baiduHint": "Register for free: https://fanyi-api.baidu.com/",
+    "baiduHint": "Chinese translation, 50k characters/month free",
     "translate": "Translate",
     "translating": "Translating...",
     "aiHint": "Uses configured AI API for translation, best quality",
     "youdaoHint": "Free, no configuration, accessible in mainland China",
     "googleHint": "Requires VPN in mainland China",
     "deeplHint": "Best translation quality, requires free API Key",
-    "baiduHint": "Chinese translation, 50k characters/month free",
     "mymemoryHint": "Free fallback option, decent quality"
+  },
+  "scope": {
+    "title": "Research Scope",
+    "hint": "Constrain searches to your research discipline and exclude irrelevant fields (biology, medicine, social sciences, etc.). Applies to all four data sources.",
+    "focused": "Focused: Power / Control / Security",
+    "focusedHint": "Electrical & electronic engineering, control engineering, computer security, smart grid, power electronics, transmission",
+    "broad": "Broad: Engineering + CS",
+    "broadHint": "All engineering and computer science, useful when surveying adjacent methods (e.g. pure ML papers)",
+    "off": "Off: all disciplines",
+    "offHint": "No discipline constraint; largest coverage with many irrelevant results",
+    "currentPrefix": "Scope: ",
+    "activeBanner": "Results filtered by research scope",
+    "offBanner": "Discipline filter disabled",
+    "change": "Change"
   }
 }

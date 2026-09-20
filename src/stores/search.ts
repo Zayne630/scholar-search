@@ -42,6 +42,8 @@ export const useSearchStore = defineStore('search', () => {
   const error = ref<string | null>(null)
   const currentCursor = ref<string | undefined>(undefined)
   const searchHistory = ref<SearchRecord[]>([])
+  // CrossRef 按 offset 分页，去重会使结果数与页码错位，单独跟踪页码
+  const crossrefPage = ref(1)
 
   // ---------------------------------------------------------------------------
   // Helpers
@@ -141,6 +143,7 @@ export const useSearchStore = defineStore('search', () => {
     results.value = []
     total.value = 0
     currentCursor.value = undefined
+    crossrefPage.value = 1
 
     try {
       const searchPromises = [
@@ -165,7 +168,6 @@ export const useSearchStore = defineStore('search', () => {
       const [openalexResult, s2Result, crossrefResult, arxivResult] = await Promise.all(searchPromises)
 
       // 保存 OpenAlex 的 cursor 用于分页
-      const openalexResponse = openalexResult as ReturnType<typeof openalexResult> & { nextCursor?: string }
       if ('nextCursor' in openalexResult) {
         currentCursor.value = (openalexResult as { nextCursor?: string }).nextCursor
       }
@@ -203,7 +205,8 @@ export const useSearchStore = defineStore('search', () => {
       const cursor = currentCursor.value || undefined
       const openalexResult = await searchOpenAlex(query.value, filters.value, cursor)
       const s2Result = await searchSemanticScholar(query.value, filters.value, results.value.length)
-      const crossrefResult = await searchCrossRef(query.value, filters.value, Math.ceil(results.value.length / 25) + 1)
+      crossrefPage.value += 1
+      const crossrefResult = await searchCrossRef(query.value, filters.value, crossrefPage.value)
 
       // 更新 OpenAlex cursor
       if ('nextCursor' in openalexResult) {

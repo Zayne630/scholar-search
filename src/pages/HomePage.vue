@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import SearchBar from '../components/SearchBar.vue'
@@ -14,8 +15,11 @@ import {
   BulbOutline,
   GitMergeOutline,
   CloudOutline,
+  ShieldCheckmarkOutline,
+  BugOutline,
 } from '@vicons/ionicons5'
 import { researchFields } from '../data/fields'
+import { getTrendData } from '../api/openalex'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -32,26 +36,34 @@ const iconMap: Record<string, any> = {
   BulbOutline,
   GitMergeOutline,
   CloudOutline,
+  ShieldCheckmarkOutline,
+  BugOutline,
 }
 
-// Paper count estimates for display
-const countMap: Record<string, string> = {
-  'llm': '120K+',
-  'computer-vision': '280K+',
-  'embodied-ai': '35K+',
-  'robotics': '95K+',
-  'control-theory': '150K+',
-  'signal-processing': '200K+',
-  'deep-learning': '350K+',
-  'reinforcement-learning': '80K+',
-  'optimization': '180K+',
-  'autonomous-driving': '60K+',
-  'multimodal': '45K+',
-  'nlp': '200K+',
-}
+// Real-time paper counts per field (current year, OpenAlex)
+const countMap = ref<Record<string, string>>({})
+const currentYear = new Date().getFullYear()
+
+onMounted(async () => {
+  await Promise.allSettled(
+    researchFields.map(async (f) => {
+      try {
+        const data = await getTrendData(f.keyword, currentYear - 2, currentYear)
+        const sum = Object.values(data).reduce((a, b) => a + b, 0)
+        if (sum > 0) {
+          countMap.value[f.slug] = sum >= 1000
+            ? `${Math.round(sum / 100) / 10}K+`
+            : `${sum}`
+        }
+      } catch {
+        // leave empty, rendered as '--'
+      }
+    }),
+  )
+})
 
 function handleSearch(query: string) {
-  router.push({ path: '/search', query: { q: query } })
+  router.push({ path: '/search', query: { q } })
 }
 
 function goToField(slug: string) {

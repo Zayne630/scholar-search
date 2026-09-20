@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useMessage, useDialog } from 'naive-ui'
 import { useSettingsStore } from '../stores/settings'
+import { getResearchScope, setResearchScope, type ResearchScope } from '../data/scope'
 import type { LLMProvider } from '../api/llm'
 import { DEFAULT_MODELS } from '../api/llm'
 import type { TranslationService } from '../api/translate'
@@ -42,6 +43,7 @@ import {
   SparklesOutline,
   CheckmarkCircleOutline,
   CloseCircleOutline,
+  LocateOutline,
 } from '@vicons/ionicons5'
 
 const { t } = useI18n()
@@ -153,6 +155,36 @@ const translationServiceOptions = computed(() => [
   { label: t('translation.ai'), value: 'ai' },
   { label: t('translation.mymemory'), value: 'mymemory' },
 ])
+
+// ---------------------------------------------------------------------------
+// Research Scope
+// ---------------------------------------------------------------------------
+
+const researchScope = ref<ResearchScope>(getResearchScope())
+
+const scopeOptions = computed(() => [
+  {
+    value: 'focused' as ResearchScope,
+    label: t('scope.focused'),
+    hint: t('scope.focusedHint'),
+  },
+  {
+    value: 'broad' as ResearchScope,
+    label: t('scope.broad'),
+    hint: t('scope.broadHint'),
+  },
+  {
+    value: 'off' as ResearchScope,
+    label: t('scope.off'),
+    hint: t('scope.offHint'),
+  },
+])
+
+function handleScopeChange(value: ResearchScope) {
+  researchScope.value = value
+  setResearchScope(value)
+  message.success(t('common.save'))
+}
 
 // ---------------------------------------------------------------------------
 // Actions
@@ -367,6 +399,42 @@ onMounted(() => {
               </NSpace>
             </NFormItem>
           </NForm>
+        </NCard>
+
+        <!-- ================================================================ -->
+        <!-- 1.5 Research Scope -->
+        <!-- ================================================================ -->
+        <NCard :title="t('scope.title')">
+          <template #header-extra>
+            <NIcon :size="18" style="color: var(--primary);"><LocateOutline /></NIcon>
+          </template>
+          <NAlert type="info" :show-icon="true" class="mb-4">
+            {{ t('scope.hint') }}
+          </NAlert>
+          <div class="flex flex-col gap-2">
+            <div
+              v-for="opt in scopeOptions"
+              :key="opt.value"
+              class="rounded-lg px-4 py-3 cursor-pointer transition-all"
+              :style="{
+                border: researchScope === opt.value
+                  ? '1px solid var(--primary)'
+                  : '1px solid var(--border)',
+                background: researchScope === opt.value ? 'var(--bg-secondary)' : 'transparent',
+              }"
+              @click="handleScopeChange(opt.value)"
+            >
+              <div class="flex items-center gap-2">
+                <NIcon v-if="researchScope === opt.value" size="16" style="color: var(--primary);">
+                  <CheckmarkCircleOutline />
+                </NIcon>
+                <span class="text-sm font-medium" style="color: var(--text);">{{ opt.label }}</span>
+              </div>
+              <p class="text-xs mt-1 ml-6" style="color: var(--text-secondary);">
+                {{ opt.hint }}
+              </p>
+            </div>
+          </div>
         </NCard>
 
         <!-- ================================================================ -->

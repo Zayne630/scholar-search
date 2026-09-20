@@ -9,6 +9,7 @@
 import axios from 'axios'
 import type { Paper, Author, SearchResult, SearchFilters } from '../types/paper'
 import { proxyFetch } from './proxy'
+import { arxivScopeFilter, toArxivCategory } from '../data/scope'
 
 // ---------------------------------------------------------------------------
 // 常量
@@ -211,10 +212,16 @@ function buildSearchQuery(query: string): string {
 
 function buildFilterQuery(filters?: SearchFilters): string {
   const parts: string[] = []
-  if (!filters) return ''
 
-  if (filters.fieldOfStudy) {
-    parts.push(`cat:${filters.fieldOfStudy}`)
+  // 研究领域约束：限定系统与控制 / 安全等 arXiv 分类
+  const scopeFilter = arxivScopeFilter()
+  if (scopeFilter) parts.push(`(${scopeFilter})`)
+
+  if (filters?.fieldOfStudy) {
+    // fieldOfStudy 是领域显示名，仅当能映射到 arXiv 分类时才生效，
+    // 否则原样拼接 cat:<显示名> 会得到空结果
+    const cat = toArxivCategory(filters.fieldOfStudy)
+    if (cat) parts.push(`cat:${cat}`)
   }
   // arXiv 没有原生的年份筛选参数，年份过滤在客户端进行
 

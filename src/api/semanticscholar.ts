@@ -9,6 +9,7 @@
 import axios from 'axios'
 import type { Paper, Author, SearchResult, SearchFilters } from '../types/paper'
 import { proxyFetch } from './proxy'
+import { s2ScopeFilter, toS2FieldsOfStudy } from '../data/scope'
 
 // ---------------------------------------------------------------------------
 // 常量
@@ -184,8 +185,15 @@ function buildS2Filters(filters?: SearchFilters): Record<string, string> {
   if (filters.venue) {
     result.venue = filters.venue
   }
-  if (filters.fieldOfStudy) {
-    result.fieldsOfStudy = filters.fieldOfStudy
+
+  // 研究领域约束（settings 中配置，见 src/data/scope.ts）
+  // 与"高级筛选"的 fieldOfStudy 取并集，且都过滤为 S2 合法枚举值，
+  // 传非法值（如 OpenAlex 的领域显示名）会导致 S2 返回 400
+  const scopeFields = toS2FieldsOfStudy(s2ScopeFilter() ?? '')
+  const manualFields = toS2FieldsOfStudy(filters.fieldOfStudy ?? '')
+  const allFields = Array.from(new Set([...scopeFields, ...manualFields]))
+  if (allFields.length) {
+    result.fieldsOfStudy = allFields.join(',')
   }
 
   return result

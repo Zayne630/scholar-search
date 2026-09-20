@@ -37,8 +37,8 @@ export function needsProxy(url: string): boolean {
 /**
  * 根据需要为 URL 添加 CORS 代理前缀。
  *
- * 如果 URL 所在域名在白名单中，返回拼接了代理前缀的 URL；
- * 否则原样返回，直接请求。
+ * 如果 URL 所在域名在白名单中，返回代理 URL（?url=<encoded> 形式，
+ * 与 cloudflare-worker 的解析协议一致）；否则原样返回，直接请求。
  *
  * @param url - 原始请求 URL
  * @returns 可直接用于 fetch/axios 的 URL
@@ -47,6 +47,6 @@ export function proxyFetch(url: string): string {
   if (!needsProxy(url)) {
     return url
   }
-  // 代理 Worker 的路径规则：PROXY_BASE_URL + 编码后的原始 URL
-  return `${PROXY_BASE_URL}${encodeURIComponent(url)}`
+  // 代理 Worker 的路径规则：PROXY_BASE_URL + ?url=<编码后的原始 URL>
+  return `${PROXY_BASE_URL}?url=${encodeURIComponent(url)}`
 }

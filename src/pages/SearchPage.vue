@@ -6,6 +6,8 @@ import { useSearchStore } from '../stores/search'
 import SearchBar from '../components/SearchBar.vue'
 import PaperCard from '../components/PaperCard.vue'
 import type { SearchFilters } from '../types/paper'
+import { getResearchScope, type ResearchScope } from '../data/scope'
+import { coreVenues, venueGroupLabels } from '../data/venues'
 import {
   NButton,
   NIcon,
@@ -27,6 +29,7 @@ import {
   ChevronDownOutline,
   CloseOutline,
   RefreshOutline,
+  LocateOutline,
 } from '@vicons/ionicons5'
 
 const route = useRoute()
@@ -75,13 +78,39 @@ const error = computed(() => searchStore.error)
 const total = computed(() => searchStore.total)
 const hasMore = computed(() => (papers.value.length > 0 && papers.value.length < 500))
 
-// Venue options from current results (extract unique venues)
+// Research scope badge
+const researchScope = ref<ResearchScope>(getResearchScope())
+const scopeLabel = computed(() => {
+  if (researchScope.value === 'focused') return t('scope.focused')
+  if (researchScope.value === 'broad') return t('scope.broad')
+  return t('scope.off')
+})
+
+// Venue options: core venues (grouped) + venues extracted from current results
 const venueOptions = computed(() => {
-  const venues = new Set<string>()
+  const coreByGroup = new Map<string, { label: string; value: string }[]>()
+  for (const v of coreVenues) {
+    const list = coreByGroup.get(v.group) ?? []
+    list.push({ label: v.label, value: v.name })
+    coreByGroup.set(v.group, list)
+  }
+  const groups = Array.from(coreByGroup.entries()).map(([group, options]) => ({
+    type: 'group' as const,
+    label: venueGroupLabels[group as keyof typeof venueGroupLabels],
+    key: group,
+    children: options,
+  }))
+
+  const resultVenues = new Set<string>()
   papers.value.forEach((p) => {
-    if (p.venue) venues.add(p.venue)
+    if (p.venue && !coreVenues.some(v => v.name === p.venue)) resultVenues.add(p.venue)
   })
-  return Array.from(venues).map((v) => ({ label: v, value: v }))
+  const extra = Array.from(resultVenues).map((v) => ({ label: v, value: v }))
+  if (extra.length === 0) return groups
+  return [
+    ...groups,
+    { type: 'group' as const, label: t('search.otherVenues'), key: 'results', children: extra },
+  ]
 })
 
 // Field options from current results
@@ -169,6 +198,26 @@ onMounted(() => {
         </template>
         {{ t('search.advanced') }}
       </NButton>
+    </div>
+
+    <!-- Research scope badge -->
+    <div class="px-4 py-1.5 flex items-center gap-2" style="border-bottom: 1px solid var(--border);">
+      <NTag size="small" round :bordered="false" type="info">
+        <template #icon>
+          <NIcon><LocateOutline /></NIcon>
+        </template>
+        {{ t('scope.currentPrefix') }}{{ scopeLabel }}
+      </NTag>
+      <span class="text-xs" style="color: var(--text-secondary);">
+        {{ researchScope === 'off' ? t('scope.offBanner') : t('scope.activeBanner') }}
+      </span>
+      <button
+        class="text-xs hover:underline ml-1"
+        style="color: var(--primary); background: none; border: none; cursor: pointer; padding: 0;"
+        @click="router.push('/settings')"
+      >
+        {{ t('scope.change') }}
+      </button>
     </div>
 
     <!-- Advanced filter drawer (mobile) / panel (desktop) -->

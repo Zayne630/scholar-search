@@ -8,6 +8,7 @@
 
 import axios from 'axios'
 import type { Paper, Author, SearchResult, SearchFilters } from '../types/paper'
+import { openalexScopeFilter } from '../data/scope'
 
 // ---------------------------------------------------------------------------
 // 常量
@@ -188,6 +189,9 @@ interface OpenAlexSearchParams {
 
 function buildFilterString(filters?: SearchFilters): string {
   const parts: string[] = []
+  // 研究领域约束（settings 中配置，见 src/data/scope.ts）
+  const scopeFilter = openalexScopeFilter()
+  if (scopeFilter) parts.push(scopeFilter)
   if (filters) {
     if (filters.yearFrom) parts.push(`from_publication_date:${filters.yearFrom}-01-01`)
     if (filters.yearTo) parts.push(`to_publication_date:${filters.yearTo}-12-31`)

@@ -21,7 +21,12 @@ export default {
     }
 
     const url = new URL(request.url)
+
+    // 支持两种代理形式：
+    // 1. ?url=<encoded target>（当前协议）
+    // 2. /<encoded target>（旧版路径形式，保留兼容）
     const targetUrl = url.searchParams.get('url')
+      ?? decodeURIComponent(url.pathname.replace(/^\/+/, ''))
 
     if (!targetUrl) {
       return new Response('Missing "url" query parameter', {

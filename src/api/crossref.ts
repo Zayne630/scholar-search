@@ -8,6 +8,7 @@
 
 import axios from 'axios'
 import type { Paper, Author, SearchResult, SearchFilters } from '../types/paper'
+import { crossrefInScope } from '../data/scope'
 
 // ---------------------------------------------------------------------------
 // 常量
@@ -185,7 +186,7 @@ export async function searchPapers(
 
   const params: Record<string, string | number> = {
     query,
-    rows: pageSize,
+    rows: pageSize * 2,
     offset: (page - 1) * pageSize,
     sort,
     order: sortOrder,
@@ -202,14 +203,19 @@ export async function searchPapers(
     const items: CrossRefItem[] = message.items ?? []
     const total: number = message['total-results'] ?? 0
 
-    const papers = items.map(mapItemToPaper)
+    // CrossRef 无学科过滤参数，研究领域约束在客户端按 subject / 期刊名过滤。
+    // 请求量加倍以保证过滤后仍有接近 pageSize 的结果。
+    const papers = items
+      .filter(item => crossrefInScope(item.subject, item['container-title']?.[0]))
+      .map(mapItemToPaper)
+      .slice(0, pageSize)
 
     return {
       papers,
       total,
       page,
       pageSize,
-      hasMore: (page - 1) * pageSize + papers.length < total,
+      hasMore: (page - 1) * pageSize + items.length < total,
     }
   } catch (error) {
     if (axios.isAxiosError(error)) {

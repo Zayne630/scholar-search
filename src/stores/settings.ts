@@ -14,6 +14,7 @@ import {
   importAllData as dbImportAllData,
   clearAllData as dbClearAllData,
 } from '../db'
+import i18n from '../i18n'
 import type { LLMProvider } from '../api/llm'
 import type { TranslationService } from '../api/translate'
 
@@ -89,9 +90,9 @@ export const useSettingsStore = defineStore('settings', () => {
     locale.value = l
     await dbSetSetting('locale', l)
 
-    // 更新 vue-i18n
+    // 更新 vue-i18n（静态导入：动态 import('../i18n') 会与 main.ts 的
+    // 静态导入形成双引用，在 Vite 8 (rolldown) 下产生 chunk 循环依赖）
     try {
-      const { default: i18n } = await import('../i18n')
       i18n.global.locale.value = l
     } catch {
       // i18n 可能未初始化
