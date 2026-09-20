@@ -22,7 +22,21 @@ import {
   ArrowBackOutline,
   SearchOutline,
   TrendingUpOutline,
+  ShieldCheckmarkOutline,
+  BugOutline,
+  HardwareChipOutline,
+  PulseOutline,
+  GitMergeOutline,
 } from '@vicons/ionicons5'
+
+// 方向图标映射（与 fields.ts 的 icon 字段对应）
+const iconMap: Record<string, any> = {
+  ShieldCheckmarkOutline,
+  BugOutline,
+  HardwareChipOutline,
+  PulseOutline,
+  GitMergeOutline,
+}
 
 const route = useRoute()
 const router = useRouter()
@@ -165,10 +179,9 @@ watch(
             class="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
             :style="{ background: field.color + '18' }"
           >
-            <div
-              class="w-5 h-5 rounded-full"
-              :style="{ background: field.color }"
-            />
+            <NIcon :size="30" :color="field.color">
+              <component :is="iconMap[field.icon]" />
+            </NIcon>
           </div>
           <div>
             <h1 class="text-2xl md:text-3xl font-bold" style="color: var(--text);">

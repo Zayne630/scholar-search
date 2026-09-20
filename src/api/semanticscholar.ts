@@ -8,7 +8,7 @@
 
 import axios from 'axios'
 import type { Paper, Author, SearchResult, SearchFilters } from '../types/paper'
-import { proxyFetch } from './proxy'
+import { proxyGet } from './proxy'
 import { s2ScopeFilter, toS2FieldsOfStudy } from '../data/scope'
 
 // ---------------------------------------------------------------------------
@@ -67,7 +67,7 @@ function buildHeaders(): Record<string, string> {
   return headers
 }
 
-/** 将 S2 API URL 通过代理发送，并附加公共参数 */
+/** 构建 S2 API 的完整 URL（不附加代理，代理由 proxyGet 处理） */
 function apiURL(path: string, params?: Record<string, string | number | undefined>): string {
   const url = new URL(`${BASE_URL}${path}`)
   if (params) {
@@ -77,7 +77,7 @@ function apiURL(path: string, params?: Record<string, string | number | undefine
       }
     }
   }
-  return proxyFetch(url.toString())
+  return url.toString()
 }
 
 // ---------------------------------------------------------------------------
@@ -237,18 +237,19 @@ export async function searchPapers(
   }
 
   try {
-    const url = apiURL('/paper/search', params)
-    const response = await axios.get(url, { headers: buildHeaders() })
-    const { data, total } = response.data
-
-    const papers: Paper[] = (data ?? []).map(mapPaperToPaper)
+    const data = await proxyGet<{ data?: S2Paper[]; total?: number }>(
+      apiURL('/paper/search', params),
+      { headers: buildHeaders() },
+    )
+    const papers: Paper[] = (data.data ?? []).map(mapPaperToPaper)
+    const total = data.total ?? 0
 
     return {
       papers,
-      total: total ?? 0,
+      total,
       page: Math.floor(offset / pageSize) + 1,
       pageSize,
-      hasMore: offset + papers.length < (total ?? 0),
+      hasMore: offset + papers.length < total,
     }
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -272,11 +273,13 @@ export async function searchPapers(
  */
 export async function getPaperById(paperId: string): Promise<Paper | null> {
   try {
-    const url = apiURL(`/paper/${encodeURIComponent(paperId)}`, {
-      fields: PAPER_FIELDS,
-    })
-    const response = await axios.get(url, { headers: buildHeaders() })
-    return mapPaperToPaper(response.data)
+    const data = await proxyGet<S2Paper>(
+      apiURL(`/paper/${encodeURIComponent(paperId)}`, {
+        fields: PAPER_FIELDS,
+      }),
+      { headers: buildHeaders() },
+    )
+    return mapPaperToPaper(data)
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.status === 404) {
       return null
@@ -294,16 +297,18 @@ export async function getPaperReferences(
   pageSize: number = 100,
 ): Promise<SearchResult> {
   try {
-    const url = apiURL(
-      `/paper/${encodeURIComponent(paperId)}/references`,
-      {
-        fields: PAPER_FIELDS,
-        offset,
-        limit: pageSize,
-      },
+    const data = await proxyGet<{ data?: Array<{ citedPaper?: S2Paper }>; total?: number }>(
+      apiURL(
+        `/paper/${encodeURIComponent(paperId)}/references`,
+        {
+          fields: PAPER_FIELDS,
+          offset,
+          limit: pageSize,
+        },
+      ),
+      { headers: buildHeaders() },
     )
-    const response = await axios.get(url, { headers: buildHeaders() })
-    const raw: Array<{ citedPaper?: S2Paper }> = response.data.data ?? []
+    const raw = data.data ?? []
 
     const papers = raw
       .filter((r) => r.citedPaper)
@@ -311,10 +316,10 @@ export async function getPaperReferences(
 
     return {
       papers,
-      total: response.data.total ?? papers.length,
+      total: data.total ?? papers.length,
       page: Math.floor(offset / pageSize) + 1,
       pageSize,
-      hasMore: offset + papers.length < (response.data.total ?? 0),
+      hasMore: offset + papers.length < (data.total ?? 0),
     }
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.status === 404) {
@@ -333,16 +338,18 @@ export async function getPaperCitations(
   pageSize: number = 100,
 ): Promise<SearchResult> {
   try {
-    const url = apiURL(
-      `/paper/${encodeURIComponent(paperId)}/citations`,
-      {
-        fields: PAPER_FIELDS,
-        offset,
-        limit: pageSize,
-      },
+    const data = await proxyGet<{ data?: Array<{ citingPaper?: S2Paper }>; total?: number }>(
+      apiURL(
+        `/paper/${encodeURIComponent(paperId)}/citations`,
+        {
+          fields: PAPER_FIELDS,
+          offset,
+          limit: pageSize,
+        },
+      ),
+      { headers: buildHeaders() },
     )
-    const response = await axios.get(url, { headers: buildHeaders() })
-    const raw: Array<{ citingPaper?: S2Paper }> = response.data.data ?? []
+    const raw = data.data ?? []
 
     const papers = raw
       .filter((r) => r.citingPaper)
@@ -350,10 +357,10 @@ export async function getPaperCitations(
 
     return {
       papers,
-      total: response.data.total ?? papers.length,
+      total: data.total ?? papers.length,
       page: Math.floor(offset / pageSize) + 1,
       pageSize,
-      hasMore: offset + papers.length < (response.data.total ?? 0),
+      hasMore: offset + papers.length < (data.total ?? 0),
     }
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.status === 404) {
@@ -371,15 +378,17 @@ export async function getRecommendedPapers(
   pageSize: number = 10,
 ): Promise<Paper[]> {
   try {
-    const url = apiURL(
-      `/paper/${encodeURIComponent(paperId)}/recommendations`,
-      {
-        fields: PAPER_FIELDS,
-        limit: pageSize,
-      },
+    const data = await proxyGet<{ recommendedPapers?: Array<{ recommendedPaper?: S2Paper }> }>(
+      apiURL(
+        `/paper/${encodeURIComponent(paperId)}/recommendations`,
+        {
+          fields: PAPER_FIELDS,
+          limit: pageSize,
+        },
+      ),
+      { headers: buildHeaders() },
     )
-    const response = await axios.get(url, { headers: buildHeaders() })
-    const raw: Array<{ recommendedPaper?: S2Paper }> = response.data.recommendedPapers ?? []
+    const raw = data.recommendedPapers ?? []
 
     return raw
       .filter((r) => r.recommendedPaper)
@@ -401,25 +410,27 @@ export async function getAuthorPapers(
   pageSize: number = 25,
 ): Promise<SearchResult> {
   try {
-    const url = apiURL(
-      `/author/${encodeURIComponent(authorId)}/papers`,
-      {
-        fields: PAPER_FIELDS,
-        offset,
-        limit: pageSize,
-      },
+    const data = await proxyGet<{ data?: S2Paper[]; total?: number }>(
+      apiURL(
+        `/author/${encodeURIComponent(authorId)}/papers`,
+        {
+          fields: PAPER_FIELDS,
+          offset,
+          limit: pageSize,
+        },
+      ),
+      { headers: buildHeaders() },
     )
-    const response = await axios.get(url, { headers: buildHeaders() })
-    const data: S2Paper[] = response.data.data ?? []
+    const raw: S2Paper[] = data.data ?? []
 
-    const papers = data.map(mapPaperToPaper)
+    const papers = raw.map(mapPaperToPaper)
 
     return {
       papers,
-      total: response.data.total ?? papers.length,
+      total: data.total ?? papers.length,
       page: Math.floor(offset / pageSize) + 1,
       pageSize,
-      hasMore: offset + papers.length < (response.data.total ?? 0),
+      hasMore: offset + papers.length < (data.total ?? 0),
     }
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.status === 404) {

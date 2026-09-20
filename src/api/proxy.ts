@@ -2,8 +2,17 @@
  * CORS 代理配置
  *
  * 部分学术 API 不支持浏览器直接跨域访问，需要通过 Cloudflare Worker 代理。
- * 本模块提供代理 URL 拼接和域名白名单判断。
+ * 本模块提供代理 URL 拼接、域名白名单判断，以及新旧两种代理协议的自动容错请求。
+ *
+ * 两种代理协议：
+ * - 新版：PROXY_BASE_URL + "?url=" + encodeURIComponent(原始 URL)
+ * - 旧版：PROXY_BASE_URL + encodeURIComponent(原始 URL)（路径形式）
+ * proxyGet 会先按新版协议请求，失败时自动降级为旧版协议重试，
+ * 因此无论线上 Worker 部署的是哪个版本，请求都能正常工作。
  */
+
+import axios from 'axios'
+import type { AxiosRequestConfig } from 'axios'
 
 /** 代理 Worker 基础地址，后续可通过环境变量或配置文件修改 */
 const PROXY_BASE_URL = 'https://scholar-proxy.workers.dev/'
@@ -34,19 +43,54 @@ export function needsProxy(url: string): boolean {
   }
 }
 
-/**
- * 根据需要为 URL 添加 CORS 代理前缀。
- *
- * 如果 URL 所在域名在白名单中，返回代理 URL（?url=<encoded> 形式，
- * 与 cloudflare-worker 的解析协议一致）；否则原样返回，直接请求。
- *
- * @param url - 原始请求 URL
- * @returns 可直接用于 fetch/axios 的 URL
- */
+/** 新版代理协议：?url= 查询参数形式 */
 export function proxyFetch(url: string): string {
   if (!needsProxy(url)) {
     return url
   }
-  // 代理 Worker 的路径规则：PROXY_BASE_URL + ?url=<编码后的原始 URL>
   return `${PROXY_BASE_URL}?url=${encodeURIComponent(url)}`
+}
+
+/** 旧版代理协议：路径拼接形式 */
+function proxyFetchLegacy(url: string): string {
+  return `${PROXY_BASE_URL}${encodeURIComponent(url)}`
+}
+
+/**
+ * 判断一次失败的请求是否值得用旧协议重试。
+ * 网络层失败（Worker 不可达、CORS 拒绝）与 400/404/405/5xx
+ * （旧版 Worker 不认识新协议参数的典型响应）重试；
+ * 429（上游限流）与 403（域名白名单拒绝）重试没有意义。
+ */
+function shouldFallback(error: unknown): boolean {
+  if (!axios.isAxiosError(error)) return false
+  if (!error.response) return true
+  const status = error.response.status
+  return status === 400 || status === 404 || status === 405 || status >= 500
+}
+
+/**
+ * 发起 GET 请求：白名单外的 URL 直连；白名单内的 URL 走代理，
+ * 并在新协议失败时自动降级旧协议。
+ *
+ * @param url - 原始请求 URL
+ * @param config - axios 配置（headers、responseType 等）
+ * @returns 响应数据（response.data）
+ */
+export async function proxyGet<T = unknown>(
+  url: string,
+  config?: AxiosRequestConfig,
+): Promise<T> {
+  if (!needsProxy(url)) {
+    const response = await axios.get<T>(url, config)
+    return response.data
+  }
+  try {
+    const response = await axios.get<T>(proxyFetch(url), config)
+    return response.data
+  } catch (error) {
+    if (!shouldFallback(error)) throw error
+    const response = await axios.get<T>(proxyFetchLegacy(url), config)
+    return response.data
+  }
 }

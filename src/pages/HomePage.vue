@@ -63,7 +63,7 @@ onMounted(async () => {
 })
 
 function handleSearch(query: string) {
-  router.push({ path: '/search', query: { q } })
+  router.push({ path: '/search', query: { q: query } })
 }
 
 function goToField(slug: string) {
@@ -95,35 +95,39 @@ function goToField(slug: string) {
         {{ t('locale') === 'zh' ? '热门研究领域' : 'Popular Research Fields' }}
       </h2>
 
-      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div
           v-for="field in researchFields"
           :key="field.slug"
-          class="group relative rounded-xl p-4 cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-lg"
+          class="group relative rounded-xl p-5 cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-lg"
           style="background: var(--bg-card); border: 1px solid var(--border);"
           @click="goToField(field.slug)"
         >
-          <!-- Icon -->
-          <div
-            class="w-10 h-10 rounded-lg flex items-center justify-center mb-3"
-            :style="{ background: field.color + '18' }"
-          >
-            <NIcon :size="22" :color="field.color">
-              <component :is="iconMap[field.icon]" />
-            </NIcon>
-          </div>
+          <div class="flex items-start gap-4">
+            <!-- Icon -->
+            <div
+              class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+              :style="{ background: field.color + '18' }"
+            >
+              <NIcon :size="26" :color="field.color">
+                <component :is="iconMap[field.icon]" />
+              </NIcon>
+            </div>
 
-          <!-- Name -->
-          <div class="font-medium text-sm mb-0.5" style="color: var(--text);">
-            {{ field.name }}
-          </div>
-          <div class="text-xs mb-2" style="color: var(--text-secondary);">
-            {{ field.nameEn }}
-          </div>
+            <div class="min-w-0 flex-1">
+              <!-- Name -->
+              <div class="font-medium text-sm mb-0.5" style="color: var(--text);">
+                {{ field.name }}
+              </div>
+              <div class="text-xs mb-2 truncate" style="color: var(--text-secondary);">
+                {{ field.nameEn }}
+              </div>
 
-          <!-- Paper count -->
-          <div class="text-xs" style="color: var(--text-secondary);">
-            {{ countMap[field.slug] || 'N/A' }} {{ t('locale') === 'zh' ? '篇论文' : 'papers' }}
+              <!-- Paper count -->
+              <div class="text-xs" style="color: var(--text-secondary);">
+                {{ countMap[field.slug] || '--' }} {{ t('locale') === 'zh' ? '篇论文' : 'papers' }}
+              </div>
+            </div>
           </div>
 
           <!-- Hover accent bar -->

@@ -8,7 +8,7 @@
 
 import axios from 'axios'
 import type { Paper, Author, SearchResult, SearchFilters } from '../types/paper'
-import { proxyFetch } from './proxy'
+import { proxyGet } from './proxy'
 import { arxivScopeFilter, toArxivCategory } from '../data/scope'
 
 // ---------------------------------------------------------------------------
@@ -293,16 +293,15 @@ export async function searchPapers(
   }
 
   const start = (page - 1) * pageSize
-  const url = proxyFetch(
-    `${BASE_URL}?search_query=${encodeURIComponent(fullQuery)}&start=${start}&max_results=${pageSize}&sortBy=relevance&sortOrder=descending`,
-  )
+  const url =
+    `${BASE_URL}?search_query=${encodeURIComponent(fullQuery)}&start=${start}&max_results=${pageSize}&sortBy=relevance&sortOrder=descending`
 
   try {
-    const response = await axios.get(url, {
+    const xml = await proxyGet<string>(url, {
       responseType: 'text',
       headers: { Accept: 'application/xml' },
     })
-    const { papers: rawPapers, total } = parseResponse(response.data)
+    const { papers: rawPapers, total } = parseResponse(xml)
 
     // 客户端过滤年份（arXiv API 不支持年份过滤参数）
     let papers = filterByYear(rawPapers, filters)
@@ -336,16 +335,15 @@ export async function getLatestPapers(
   maxResults: number = 20,
 ): Promise<Paper[]> {
   const searchQuery = category ? `cat:${category}` : 'all'
-  const url = proxyFetch(
-    `${BASE_URL}?search_query=${encodeURIComponent(searchQuery)}&start=0&max_results=${maxResults}&sortBy=submittedDate&sortOrder=descending`,
-  )
+  const url =
+    `${BASE_URL}?search_query=${encodeURIComponent(searchQuery)}&start=0&max_results=${maxResults}&sortBy=submittedDate&sortOrder=descending`
 
   try {
-    const response = await axios.get(url, {
+    const xml = await proxyGet<string>(url, {
       responseType: 'text',
       headers: { Accept: 'application/xml' },
     })
-    const { papers } = parseResponse(response.data)
+    const { papers } = parseResponse(xml)
     return papers
   } catch (error) {
     throw new Error(`arXiv latest papers failed: ${(error as Error).message}`)
