@@ -299,7 +299,7 @@ function renderCitationGraph() {
   const currentId = paper.value.id
   const nodes: echarts.EChartsOption['series'] = []
   const links: { source: string; target: string }[] = []
-  const nodeData: { name: string; category: number; symbolSize: number; value: string; itemStyle?: { color?: string } }[] = []
+  const nodeData: { name: string; category: number; symbolSize: number; value: string }[] = []
 
   // Current paper node
   nodeData.push({
@@ -307,7 +307,6 @@ function renderCitationGraph() {
     category: 0,
     symbolSize: 50,
     value: paper.value.title,
-    itemStyle: { color: '#6366f1' },
   })
 
   // Reference nodes (category 1)
@@ -317,7 +316,6 @@ function renderCitationGraph() {
       category: 1,
       symbolSize: 25,
       value: ref.title,
-      itemStyle: { color: '#10b981' },
     })
     links.push({ source: currentId, target: ref.id })
   })
@@ -330,7 +328,6 @@ function renderCitationGraph() {
         category: 2,
         symbolSize: 25,
         value: cite.title,
-        itemStyle: { color: '#f59e0b' },
       })
     }
     links.push({ source: cite.id, target: currentId })
@@ -348,7 +345,7 @@ function renderCitationGraph() {
       },
     },
     legend: {
-      data: [t('paper.abstract'), t('paper.references'), t('paper.citedBy')],
+      data: [t('paper.currentPaper'), t('paper.references'), t('paper.citedBy')],
       bottom: 0,
       textStyle: { color: 'var(--text-secondary)' },
     },
@@ -365,9 +362,9 @@ function renderCitationGraph() {
           edgeLength: 80,
         },
         categories: [
-          { name: t('paper.abstract') },
-          { name: t('paper.references') },
-          { name: t('paper.citedBy') },
+          { name: t('paper.currentPaper'), itemStyle: { color: '#6366f1' } },
+          { name: t('paper.references'), itemStyle: { color: '#10b981' } },
+          { name: t('paper.citedBy'), itemStyle: { color: '#f59e0b' } },
         ],
         data: nodeData,
         links: links.map(l => ({ ...l, lineStyle: { opacity: 0.4 } })),
