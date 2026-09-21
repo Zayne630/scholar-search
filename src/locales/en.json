@@ -49,7 +49,9 @@
     "downloadBibtex": "Export BibTeX",
     "tldr": "AI Summary",
     "noAbstract": "No abstract available",
-    "fieldsOfStudy": "Fields of Study"
+    "fieldsOfStudy": "Fields of Study",
+    "emptyRefsHint": "No reference data yet. References of newly published papers may not be indexed yet; configure a Semantic Scholar API key in Settings for richer citation data.",
+    "emptyCitesHint": "No citing records yet. Newly published papers usually take time to accumulate citations."
   },
   "library": {
     "title": "My Library",

@@ -9,6 +9,7 @@
 import axios from 'axios'
 import type { Paper, Author, SearchResult, SearchFilters } from '../types/paper'
 import { proxyGet } from './proxy'
+import { isExactPhrase } from './searchQuery'
 import { arxivScopeFilter, toArxivCategory } from '../data/scope'
 
 // ---------------------------------------------------------------------------
@@ -210,12 +211,15 @@ function buildSearchQuery(query: string): string {
   return `ti:"${escaped}" OR abs:"${escaped}"`
 }
 
-function buildFilterQuery(filters?: SearchFilters): string {
+function buildFilterQuery(filters?: SearchFilters, skipScope = false): string {
   const parts: string[] = []
 
-  // 研究领域约束：限定系统与控制 / 安全等 arXiv 分类
-  const scopeFilter = arxivScopeFilter()
-  if (scopeFilter) parts.push(`(${scopeFilter})`)
+  // 研究领域约束：限定系统与控制 / 安全等 arXiv 分类。
+  // 精确短语查询自带消歧，跳过分类限制以免误杀。
+  if (!skipScope) {
+    const scopeFilter = arxivScopeFilter()
+    if (scopeFilter) parts.push(`(${scopeFilter})`)
+  }
 
   if (filters?.fieldOfStudy) {
     // fieldOfStudy 是领域显示名，仅当能映射到 arXiv 分类时才生效，
@@ -285,7 +289,7 @@ export async function searchPapers(
   pageSize: number = 25,
 ): Promise<SearchResult> {
   const searchQuery = buildSearchQuery(query)
-  const filterQuery = buildFilterQuery(filters)
+  const filterQuery = buildFilterQuery(filters, isExactPhrase(searchQuery))
 
   let fullQuery = searchQuery
   if (filterQuery) {

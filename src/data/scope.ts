@@ -22,6 +22,7 @@ const OPENALEX_FOCUSED_CONCEPTS = [
   'C119599485', // Electrical engineering
   'C24326235',  // Electronic engineering
   'C133731056', // Control engineering
+  'C17500928',  // Control system（同义概念，标注不稳定时兜底）
   'C38652104',  // Computer security
   'C54089160',  // Power engineering
   'C10558101',  // Smart grid

@@ -9,6 +9,7 @@
 import axios from 'axios'
 import type { Paper, Author, SearchResult, SearchFilters } from '../types/paper'
 import { proxyGet } from './proxy'
+import { quotedTermIfNeeded, isExactPhrase } from './searchQuery'
 import { s2ScopeFilter, toS2FieldsOfStudy } from '../data/scope'
 
 // ---------------------------------------------------------------------------
@@ -169,7 +170,7 @@ function mapPaperToPaper(p: S2Paper): Paper {
 // 筛选器构建
 // ---------------------------------------------------------------------------
 
-function buildS2Filters(filters?: SearchFilters): Record<string, string> {
+function buildS2Filters(filters?: SearchFilters, skipScope = false): Record<string, string> {
   const result: Record<string, string> = {}
   if (!filters) return result
 
@@ -186,10 +187,11 @@ function buildS2Filters(filters?: SearchFilters): Record<string, string> {
     result.venue = filters.venue
   }
 
-  // 研究领域约束（settings 中配置，见 src/data/scope.ts）
+  // 研究领域约束（settings 中配置，见 src/data/scope.ts）。
+  // 精确短语查询自带消歧，跳过学科过滤以免误杀。
   // 与"高级筛选"的 fieldOfStudy 取并集，且都过滤为 S2 合法枚举值，
   // 传非法值（如 OpenAlex 的领域显示名）会导致 S2 返回 400
-  const scopeFields = toS2FieldsOfStudy(s2ScopeFilter() ?? '')
+  const scopeFields = skipScope ? [] : toS2FieldsOfStudy(s2ScopeFilter() ?? '')
   const manualFields = toS2FieldsOfStudy(filters.fieldOfStudy ?? '')
   const allFields = Array.from(new Set([...scopeFields, ...manualFields]))
   if (allFields.length) {
@@ -217,15 +219,16 @@ export async function searchPapers(
   offset: number = 0,
   pageSize: number = 25,
 ): Promise<SearchResult> {
+  const processedQuery = quotedTermIfNeeded(query)
   const params: Record<string, string | number | undefined> = {
-    query,
+    query: processedQuery,
     offset,
     limit: pageSize,
     fields: PAPER_FIELDS,
   }
 
   // Semantic Scholar 支持通过查询参数进行年份等过滤
-  const s2Filters = buildS2Filters(filters)
+  const s2Filters = buildS2Filters(filters, isExactPhrase(processedQuery))
   if (s2Filters.year) {
     params.year = s2Filters.year
   }

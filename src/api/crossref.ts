@@ -8,6 +8,7 @@
 
 import axios from 'axios'
 import type { Paper, Author, SearchResult, SearchFilters } from '../types/paper'
+import { quotedTermIfNeeded } from './searchQuery'
 import { crossrefInScope } from '../data/scope'
 
 // ---------------------------------------------------------------------------
@@ -180,12 +181,15 @@ export async function searchPapers(
   page: number = 1,
   pageSize: number = 25,
 ): Promise<SearchResult> {
+  const processedQuery = quotedTermIfNeeded(query)
+  // CrossRef 的 query 是模糊分词匹配、不认引号短语语法，
+  // 精确短语也无法在 CrossRef 侧消歧，学科过滤始终启用
   const crFilters = buildCrossRefFilters(filters)
   const sort = buildSort(filters)
   const sortOrder = filters?.sortBy === 'date' && filters.sortOrder === 'asc' ? 'asc' : 'desc'
 
   const params: Record<string, string | number> = {
-    query,
+    query: processedQuery,
     rows: pageSize * 2,
     offset: (page - 1) * pageSize,
     sort,

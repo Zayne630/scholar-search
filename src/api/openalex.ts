@@ -9,6 +9,7 @@
 import axios from 'axios'
 import type { Paper, Author, SearchResult, SearchFilters } from '../types/paper'
 import { openalexScopeFilter } from '../data/scope'
+import { quotedTermIfNeeded, isExactPhrase } from './searchQuery'
 
 // ---------------------------------------------------------------------------
 // 常量
@@ -187,11 +188,14 @@ interface OpenAlexSearchParams {
   select?: string
 }
 
-function buildFilterString(filters?: SearchFilters): string {
+function buildFilterString(filters?: SearchFilters, skipScope = false): string {
   const parts: string[] = []
-  // 研究领域约束（settings 中配置，见 src/data/scope.ts）
-  const scopeFilter = openalexScopeFilter()
-  if (scopeFilter) parts.push(scopeFilter)
+  // 研究领域约束（settings 中配置，见 src/data/scope.ts）。
+  // 精确短语查询自带消歧，跳过学科过滤以免误杀。
+  if (!skipScope) {
+    const scopeFilter = openalexScopeFilter()
+    if (scopeFilter) parts.push(scopeFilter)
+  }
   if (filters) {
     if (filters.yearFrom) parts.push(`from_publication_date:${filters.yearFrom}-01-01`)
     if (filters.yearTo) parts.push(`to_publication_date:${filters.yearTo}-12-31`)
@@ -236,9 +240,10 @@ export async function searchPapers(
   cursor?: string,
   pageSize: number = 25,
 ): Promise<SearchResult> {
+  const processedQuery = query ? quotedTermIfNeeded(query) : undefined
   const params: OpenAlexSearchParams = {
-    search: query || undefined,
-    filter: buildFilterString(filters) || undefined,
+    search: processedQuery,
+    filter: buildFilterString(filters, isExactPhrase(processedQuery ?? '')) || undefined,
     sort: buildSortString(filters),
     per_page: pageSize,
     cursor: cursor || '*',

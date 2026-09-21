@@ -702,7 +702,13 @@ function goToPaper(id: string) {
                       </div>
                     </NCard>
                   </div>
-                  <NEmpty v-else :description="t('search.noResults')" class="py-8" />
+                  <NEmpty v-else :description="t('search.noResults')" class="py-8">
+                    <template #extra>
+                      <p class="text-xs max-w-md text-center leading-relaxed" style="color: var(--text-secondary);">
+                        {{ t('paper.emptyRefsHint') }}
+                      </p>
+                    </template>
+                  </NEmpty>
                 </NSpin>
               </NTabPane>
 
@@ -728,7 +734,13 @@ function goToPaper(id: string) {
                       </div>
                     </NCard>
                   </div>
-                  <NEmpty v-else :description="t('search.noResults')" class="py-8" />
+                  <NEmpty v-else :description="t('search.noResults')" class="py-8">
+                    <template #extra>
+                      <p class="text-xs max-w-md text-center leading-relaxed" style="color: var(--text-secondary);">
+                        {{ t('paper.emptyCitesHint') }}
+                      </p>
+                    </template>
+                  </NEmpty>
                 </NSpin>
               </NTabPane>
 
