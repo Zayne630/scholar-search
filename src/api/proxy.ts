@@ -14,8 +14,8 @@
 import axios from 'axios'
 import type { AxiosRequestConfig } from 'axios'
 
-/** 代理 Worker 基础地址，后续可通过环境变量或配置文件修改 */
-const PROXY_BASE_URL = 'https://scholar-proxy.workers.dev/'
+/** 代理 Worker 基础地址（Cloudflare 新账号部署的 scholar-proxy） */
+const PROXY_BASE_URL = 'https://scholar-proxy.zayne-630.workers.dev/'
 
 /**
  * 需要 CORS 代理的域名白名单。
